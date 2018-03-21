@@ -1,0 +1,42 @@
+https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs
+
+
+generate private key and CSR
+openssl req \
+       -newkey rsa:2048 -nodes -keyout PC1.key \
+       -out domain.csr \
+       -subj "/C=IN/ST=NEW DELHI/L=Delhi/O=Example Brooklyn Company/CN=example.com"
+
+Generate certificate and key of CA                       // this step should be done once and will add this certificate on client end
+openssl req \
+       -newkey rsa:2048 -nodes -keyout CAprivate.key \
+       -x509 -days 365 -out CAcertificate.crt \
+       -subj "/C=IN/ST=NEW DELHI/L=Delhi/O=Example Brooklyn Company/CN=CA.com"
+
+
+Generate PC 1 certificate using csr of PC1 and private key of CA
+openssl x509 \
+       -signkey CAprivate.key \
+       -in domain.csr \
+       -req -days 365 -out PC1.crt \
+       -subj "/C=IN/ST=NEW DELHI/L=Delhi/O=Example Brooklyn Company/CN=example.com"
+
+
+
+Generate certificate for the client using CSR and private key of CA
+openssl x509 \
+       -signkey domain.key \
+       -in domain.csr \
+       -req -days 365 -out domain.crt
+
+
+
+Verify a Certificate was Signed by a CA
+openssl verify -verbose -CAFile ca.crt domain.crt
+
+
+
+
+
+
+
